@@ -55,4 +55,24 @@ public record OurUsers(
     public boolean isEnabled() {
         return true; // Customize this logic if needed
     }
+
+    public int getId() {
+        return id != null ? id : 0; // Return 0 if id is null
+    }
+
+    // public String getEmail() {
+        
+    // }
+
+    // public String getName() {
+        
+    // }
+
+    // public String getCity() {
+        
+    // }
+
+    // public String getRole() {
+        
+    // }
 }
