@@ -22,7 +22,7 @@ public class JWTUtilities {
     private static final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
     
     public JWTUtilities() {
-        String secretString = "A64C23321D23D9B52CF428F271834"; // To be fixed to make secure and use .getenv with secrektkey on environ var
+        String secretString = "27lMCQ6oe2m2VZHCW8etOQ=="; // To be fixed to make secure and use .getenv with secrektkey on environ var
         byte[] keyBytes = Base64.getDecoder().decode(secretString.getBytes(StandardCharsets.UTF_8));
         this.Key = new SecretKeySpec(keyBytes, "HmacSHA256");
     }

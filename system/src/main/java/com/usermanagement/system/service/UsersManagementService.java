@@ -33,18 +33,23 @@ public class UsersManagementService {
         this.authenticationProvider = authenticationProvider;
     }
 
-    public RequestResponse register(RequestResponse registrationRequest){
+    public RequestResponse register(RequestResponse registrationRequest) {
         RequestResponse response = new RequestResponse();
-
+    
         try {
-            OurUsers ourUser = new OurUsers(null, null, null, null, null, null);
-            ourUser.withEmail(registrationRequest.getEmail());
-            ourUser.withName(registrationRequest.getName());
-            ourUser.withPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-            ourUser.withCity(registrationRequest.getCity());
-            ourUser.withRole(registrationRequest.getRole()); // Default role
+            // Create a new OurUsers object with the provided details
+            OurUsers ourUser = new OurUsers(null, null, null, null, null, null)
+                .withEmail(registrationRequest.getEmail())
+                .withName(registrationRequest.getName())
+                .withPassword(passwordEncoder.encode(registrationRequest.getPassword()))
+                .withCity(registrationRequest.getCity())
+                .withRole(registrationRequest.getRole()); // Default role
+    
+            // Save the user to the database
             OurUsers ourUserResult = usersRepository.save(ourUser);
-            if(ourUserResult.getId()>0){
+    
+            // Populate the response with the saved user details
+            if (ourUserResult.getId() > 0) {
                 response.setOurUsers(ourUserResult);
                 response.setStatusCode(200);
                 response.setMessage("User registered successfully");
@@ -52,11 +57,12 @@ public class UsersManagementService {
                 response.setStatusCode(400);
                 response.setError("User registration failed");
             }
-            
+    
         } catch (Exception e) {
             response.setStatusCode(500);
-            response.setError(e.getMessage());
+            response.setError("Error occurred: " + e.getMessage());
         }
+    
         return response;
     }
 

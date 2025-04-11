@@ -14,7 +14,7 @@ import lombok.Data;
 public class RequestResponse {
 
     private int statusCode;
-    private String message; 
+    private String message;
     private String error;
     private String token;
     private String refreshToken;
@@ -24,7 +24,6 @@ public class RequestResponse {
     private String city;
     private String role;
     private String password;
-    private OurUsers ourUsers;
-    private List<OurUsers> ourUsersList;
-
+    private OurUsers ourUsers; // Include the OurUsers object
+    private List<OurUsers> ourUsersList; // For lists of users
 }

@@ -24,12 +24,14 @@ public class UsersRepository {
                 .optional();
     }
 
+    // Ito yung problema sa save since hindi siya nagssave sa database pero di pumapasok sa if since walang .one() sa version ngayon na single() na
     public OurUsers save(OurUsers ourUser) {
         String sql = """
             INSERT INTO our_users (email, name, password, city, role)
             VALUES (:email, :name, :password, :city, :role)
         """;
     
+        // Execute the INSERT query
         int rowsAffected = jdbcClient.sql(sql)
             .param("email", ourUser.email())
             .param("name", ourUser.name())
@@ -39,8 +41,15 @@ public class UsersRepository {
             .update();
     
         if (rowsAffected > 0) {
-            // Return the same user object with a placeholder ID (if needed)
-            return ourUser.withId(0); // Replace 0 with the actual ID if available
+            // Retrieve the generated ID
+            String selectSql = "SELECT id FROM our_users WHERE email = :email";
+            Integer generatedId = jdbcClient.sql(selectSql)
+                .param("email", ourUser.email())
+                .query(Integer.class)
+                .single();
+    
+            // Return a new OurUsers object with the generated ID
+            return ourUser.withId(generatedId);
         } else {
             throw new IllegalStateException("Failed to insert user into the database");
         }

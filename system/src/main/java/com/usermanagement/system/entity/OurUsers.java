@@ -57,7 +57,7 @@ public record OurUsers(
     }
 
     public int getId() {
-        return id != null ? id : 0; // Return 0 if id is null
+        return id; // Return 0 if id is null
     }
 
     // public String getEmail() {
