@@ -74,4 +74,27 @@ public class UsersRepository {
                 .update();
     }
 
+    public OurUsers update(OurUsers ourUser) {
+        String sql = """
+            UPDATE our_users
+            SET name = :name, email = :email, password = :password, city = :city, role = :role
+            WHERE id = :id
+        """;
+    
+        int rowsAffected = jdbcClient.sql(sql)
+            .param("id", ourUser.id())
+            .param("name", ourUser.name())
+            .param("email", ourUser.email())
+            .param("password", ourUser.password())
+            .param("city", ourUser.city())
+            .param("role", ourUser.role())
+            .update();
+    
+        if (rowsAffected > 0) {
+            return ourUser;
+        } else {
+            throw new IllegalStateException("Failed to update user with ID: " + ourUser.id());
+        }
+    }
+
 }

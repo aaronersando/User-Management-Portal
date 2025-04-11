@@ -170,26 +170,25 @@ public class UsersManagementService {
         return response;
     }
 
-    public RequestResponse updateUser(Integer userId, OurUsers updatedUser){
+    public RequestResponse updateUser(Integer userId, OurUsers updatedUser) {
         RequestResponse response = new RequestResponse();
         try {
             Optional<OurUsers> userOptional = usersRepository.findById(userId);
             if (userOptional.isPresent()) {
-                OurUsers existingUser = userOptional.get();
-                existingUser.withName(updatedUser.name());
-                existingUser.withEmail(updatedUser.email());
-                existingUser.withCity(updatedUser.city());
-                existingUser.withRole(updatedUser.role());
-                
-                if(updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()){
-                    existingUser.withPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                OurUsers existingUser = userOptional.get()
+                    .withName(updatedUser.name())
+                    .withEmail(updatedUser.email())
+                    .withCity(updatedUser.city())
+                    .withRole(updatedUser.role());
+    
+                if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+                    existingUser = existingUser.withPassword(passwordEncoder.encode(updatedUser.getPassword()));
                 }
-
-                OurUsers savedUser = usersRepository.save(existingUser);
+    
+                OurUsers savedUser = usersRepository.update(existingUser);
                 response.setStatusCode(200);
                 response.setMessage("User with ID " + userId + " updated successfully");
                 response.setOurUsers(savedUser);
-            
             } else {
                 response.setStatusCode(404);
                 response.setMessage("User not found for update");
