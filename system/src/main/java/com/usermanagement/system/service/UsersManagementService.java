@@ -78,6 +78,7 @@ public class UsersManagementService {
             var refreshToken = jwtUtilities.generateRefreshToken(new HashMap<>(),user);
             response.setStatusCode(200);
             response.setToken(jwt);
+            response.setRole(user.role());
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hrs");
             response.setMessage("Login successful");
