@@ -4,6 +4,7 @@ import {Link, useNavigate} from "react-router-dom";
 
 function ProfilePage() {
     const [profileInfo, setProfileInfo] = useState({});
+    const [loading, setLoading] = useState(true);
     const isAdmin = UserService.isAdmin();
     const navigate = useNavigate();
 
@@ -18,16 +19,26 @@ function ProfilePage() {
     const fetchProfileInfo = async () => { 
         try {
             const token = localStorage.getItem("token");
+            if (!token) {
+                navigate('/login');
+                return;
+            }
             const response = await UserService.getYourProfile(token);
             setProfileInfo(response.ourUsers);
         } catch (error) {
             console.log("Error fetching profile info:", error);
             if (error.response?.status === 403) {
                 UserService.logout();
-                window.location.replace('/login');
+                navigate('/login');
             }
+        } finally {
+            setLoading(false);
         }
     };
+
+    if (loading) {
+        return <div className="loading">Loading...</div>;
+    }
 
     return(
         <div className="profile-page-container">

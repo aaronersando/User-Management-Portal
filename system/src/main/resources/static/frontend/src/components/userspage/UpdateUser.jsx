@@ -7,6 +7,7 @@ function UpdateUser(){
     const {userId} = useParams();
     const isAdmin = UserService.isAdmin();
     const [originalEmail, setOriginalEmail] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [userData, setUserData] = useState({
         name: "",
@@ -36,52 +37,50 @@ function UpdateUser(){
             console.error("Error fetching user data:", error);
             if (error.response?.status === 403) {
                 UserService.logout();
-                window.location.replace('/login');
+                navigate('/login');
             }
         }
     }
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setUserData((prevUserData) => ({
-            ...prevUserData,
+        setUserData(prev => ({
+            ...prev,
             [name]: value
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
         
-        try {
-            const confirmUpdate = window.confirm("Are you sure you want to update this user?");
-            if (confirmUpdate) {
-                const token = localStorage.getItem("token");
-                const isEmailChanged = userData.email !== originalEmail;
+        const confirmUpdate = window.confirm("Are you sure you want to update this user?");
+        if (!confirmUpdate) return;
 
-                if (isAdmin) {
-                    await UserService.updateUser(userId, userData, token);
-                    navigate("/admin/user-management");
+        setIsSubmitting(true);
+        const token = localStorage.getItem("token");
+        const isEmailChanged = userData.email !== originalEmail;
+
+        try {
+            if (isAdmin) {
+                await UserService.updateUser(userId, userData, token);
+                navigate("/admin/user-management");
+            } else {
+                if (isEmailChanged) {
+                    await UserService.updateOwnProfile(userId, userData, token);
+                    UserService.logout();
+                    window.location.href = '/login';
                 } else {
-                    if (isEmailChanged) {
-                        // When email is changed:
-                        // 1. Update the user
-                        await UserService.updateOwnProfile(userId, userData, token);
-                        // 2. Clear auth state
-                        UserService.logout();
-                        // 3. Force redirect and refresh
-                        window.location.replace('/login');
-                        return;
-                    } else {
-                        await UserService.updateOwnProfile(userId, userData, token);
-                        navigate("/profile");
-                    }
+                    await UserService.updateOwnProfile(userId, userData, token);
+                    navigate("/profile");
                 }
             }
         } catch (error) {
             console.error("Error updating user:", error);
+            setIsSubmitting(false);
             if (error.response?.status === 403) {
                 UserService.logout();
-                window.location.replace('/login');
+                window.location.href = '/login';
             } else {
                 alert("Error updating profile: " + error.message);
             }
@@ -99,6 +98,7 @@ function UpdateUser(){
                         name="name"
                         value={userData.name}
                         onChange={handleInputChange}
+                        disabled={isSubmitting}
                     />
                 </div>
                 <div className="form-group">
@@ -108,6 +108,7 @@ function UpdateUser(){
                         name="email"
                         value={userData.email}
                         onChange={handleInputChange}
+                        disabled={isSubmitting}
                     />
                 </div>
                 <div className="form-group">
@@ -117,7 +118,7 @@ function UpdateUser(){
                         name="role"
                         value={userData.role}
                         onChange={handleInputChange}
-                        disabled={!isAdmin} // Only admin can change roles
+                        disabled={!isAdmin || isSubmitting}
                     />
                 </div>
                 <div className="form-group">
@@ -127,12 +128,15 @@ function UpdateUser(){
                         name="city"
                         value={userData.city}
                         onChange={handleInputChange}
+                        disabled={isSubmitting}
                     />
                 </div>
-                <button type="submit">Update User</button>
+                <button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Updating...' : 'Update User'}
+                </button>
             </form>
         </div>
-    )
+    );
 }
 
 export default UpdateUser;

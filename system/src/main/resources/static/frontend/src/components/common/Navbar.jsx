@@ -1,23 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import UserService from "../service/UserService";
 
 function Navbar() { 
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const isAuthenticated = UserService.isAuthenticated();
     const isAdmin = UserService.isAdmin();
-    // const isUser = UserService.isUser();
 
-    const handleLogout = () => {
-        const confirmDelete = window.confirm("Are you sure you want to log out?");
-        if (confirmDelete) {
+    const handleLogout = (e) => {
+        e.preventDefault();
+        const confirmLogout = window.confirm("Are you sure you want to log out?");
+        if (confirmLogout) {
+            setIsTransitioning(true);
             UserService.logout();
-            window.location.reload(); // Reload the page after logout
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 300);
         }
     };
 
-
     return(
-        <nav>
+        <nav className={isTransitioning ? 'fade-out' : ''}>
             <ul>
                 {!isAuthenticated && <li><Link to="/">Phegen Deb</Link></li>}
                 {isAuthenticated && <li><Link to="/profile">Profile</Link></li>}
@@ -25,9 +28,7 @@ function Navbar() {
                 {isAuthenticated && <li><Link to="/" onClick={handleLogout}>Logout</Link></li>}
             </ul>
         </nav>
-        
     );
-
 }
 
 export default Navbar;
