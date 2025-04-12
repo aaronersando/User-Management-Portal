@@ -1,15 +1,13 @@
-import React from "react";
+import React from 'react'
 
-function Footer() {
-  return (
-    
-      <div>
-        <footer className="footer">
-            <p>&copy; {new Date().getFullYear()} Your Company Name. All rights reserved.</p>
-            <p>Privacy Policy | Terms of Service</p>
-        </footer>
-      </div>
-  );
+const FooterComponent = () => {
+    return (
+        <div>
+            <footer className='footer'>
+                <span>Phegon Dev | All Right Reserved &copy; {new Date().getFullYear()} </span>
+            </footer>
+        </div>
+    )
 }
 
-export default Footer;
+export default FooterComponent
