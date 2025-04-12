@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import UserService from "../service/UserService";
+import UserService from "../../services/UserService";
 
 function Navbar() { 
     const [isTransitioning, setIsTransitioning] = useState(false);

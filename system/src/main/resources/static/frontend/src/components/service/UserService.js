@@ -5,7 +5,7 @@ class UserService{
 
     static async login(email, password){
         try{
-            const response = await axios.post(`${UserService.BASE_URL}/auth/login`, {email, password});
+            const response = await axios.post(`${UsersService.BASE_URL}/auth/login`, {email, password});
             return response.data;
         }catch(error){
             throw error
@@ -14,7 +14,7 @@ class UserService{
 
     static async register(userData, token){
         try{
-            const response = await axios.post(`${UserService.BASE_URL}/auth/register`, userData,{
+            const response = await axios.post(`${UsersService.BASE_URL}/auth/register`, userData, {
 
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -29,9 +29,11 @@ class UserService{
 
     static async getAllUsers(token){
         try{
-            const response = await axios.get(`${UserService.BASE_URL}/admin/get-all-users`, {
+            const response = await axios.post(`${UsersService.BASE_URL}/admin/get-all-users`, {
+
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    // 'Content-Type': 'application/json'
                 }
             });
             return response.data;
@@ -42,9 +44,26 @@ class UserService{
 
     static async getYourProfile(token){
         try{
-            const response = await axios.get(`${UserService.BASE_URL}/adminuser/get-profile`, {
+            const response = await axios.post(`${UsersService.BASE_URL}/adminuser/get-profile`, {
+
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    // 'Content-Type': 'application/json'
+                }
+            });
+            return response.data;
+        }catch(error){
+            throw error
+        }
+    }
+
+    static async getUserByid(userId, token){
+        try{
+            const response = await axios.post(`${UsersService.BASE_URL}/admin/get-user/${userId}`, {
+
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    // 'Content-Type': 'application/json'
                 }
             });
             return response.data;
@@ -55,22 +74,11 @@ class UserService{
 
     static async getUserById(userId, token){
         try{
-            const response = await axios.get(`${UserService.BASE_URL}/admin/get-user/${userId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            return response.data;
-        }catch(error){
-            throw error
-        }
-    }
+            const response = await axios.post(`${UsersService.BASE_URL}/admin/delete/${userId}`, {
 
-    static async deleteUser(userId, token){
-        try{
-            const response = await axios.delete(`${UserService.BASE_URL}/admin/delete/${userId}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    // 'Content-Type': 'application/json'
                 }
             });
             return response.data;
@@ -81,9 +89,11 @@ class UserService{
 
     static async updateUser(userId, userData, token){
         try{
-            const response = await axios.put(`${UserService.BASE_URL}/admin/update/${userId}`, userData, {
+            const response = await axios.post(`${UsersService.BASE_URL}/admin/update/${userId}`, userData,{
+
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    // 'Content-Type': 'application/json'
                 }
             });
             return response.data;
@@ -92,18 +102,6 @@ class UserService{
         }
     }
 
-    static async updateOwnProfile(userId, userData, token){
-        try{
-            const response = await axios.put(`${UserService.BASE_URL}/adminuser/update-profile/${userId}`, userData,{
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            return response.data;
-        }catch(error){
-            throw error
-        }
-    }
 
     // AUTHENTICATION CHECKER
     static logout(){
