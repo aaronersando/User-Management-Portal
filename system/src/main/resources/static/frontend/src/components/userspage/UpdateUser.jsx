@@ -5,6 +5,8 @@ import UserService from "../service/UserService";
 function UpdateUser(){
     const navigate = useNavigate();
     const {userId} = useParams();
+    const isAdmin = UserService.isAdmin();
+    const [originalEmail, setOriginalEmail] = useState("");
 
     const [userData, setUserData] = useState({
         name: "",
@@ -14,24 +16,33 @@ function UpdateUser(){
     });
 
     useEffect(() => {
+        if (!UserService.isAuthenticated()) {
+            navigate('/login');
+            return;
+        }
         fetchUserDataById(userId);
-    }, [userId]);
+    }, [userId, navigate]);
 
     const fetchUserDataById = async (userId) => {
         try {
             const token = localStorage.getItem("token");
-            const response = await UserService.getUserById(userId, token);
+            const response = isAdmin ? 
+                await UserService.getUserById(userId, token) :
+                await UserService.getYourProfile(token);
             const {name, email, role, city} = response.ourUsers;
-            setUser({name, email, role, city});
+            setUserData({name, email, role, city});
+            setOriginalEmail(email);
         } catch (error) {
             console.error("Error fetching user data:", error);
+            if (error.response?.status === 403) {
+                UserService.logout();
+                window.location.replace('/login');
+            }
         }
     }
 
     const handleInputChange = (e) => {
-
         const { name, value } = e.target;
-
         setUserData((prevUserData) => ({
             ...prevUserData,
             [name]: value
@@ -42,19 +53,40 @@ function UpdateUser(){
         e.preventDefault();
         
         try {
-            const confirmDelete = window.confirm("Are you sure you want to update this user?");
-            if (confirmDelete) {
+            const confirmUpdate = window.confirm("Are you sure you want to update this user?");
+            if (confirmUpdate) {
                 const token = localStorage.getItem("token");
-                await UserService.updateUser(userId, userData, token);
-                navigate("/admin/user-management");
+                const isEmailChanged = userData.email !== originalEmail;
+
+                if (isAdmin) {
+                    await UserService.updateUser(userId, userData, token);
+                    navigate("/admin/user-management");
+                } else {
+                    if (isEmailChanged) {
+                        // When email is changed:
+                        // 1. Update the user
+                        await UserService.updateOwnProfile(userId, userData, token);
+                        // 2. Clear auth state
+                        UserService.logout();
+                        // 3. Force redirect and refresh
+                        window.location.replace('/login');
+                        return;
+                    } else {
+                        await UserService.updateOwnProfile(userId, userData, token);
+                        navigate("/profile");
+                    }
+                }
             }
-            
         } catch (error) {
             console.error("Error updating user:", error);
-            alert(error)
+            if (error.response?.status === 403) {
+                UserService.logout();
+                window.location.replace('/login');
+            } else {
+                alert("Error updating profile: " + error.message);
+            }
         }
     };
-
 
     return(
         <div className="auth-container">
@@ -79,16 +111,17 @@ function UpdateUser(){
                     />
                 </div>
                 <div className="form-group">
-                    <label >Role:</label>
+                    <label>Role:</label>
                     <input
                         type="text"
                         name="role"
                         value={userData.role}
                         onChange={handleInputChange}
+                        disabled={!isAdmin} // Only admin can change roles
                     />
                 </div>
                 <div className="form-group">
-                    <label >City:</label>
+                    <label>City:</label>
                     <input
                         type="text"
                         name="city"
@@ -100,5 +133,6 @@ function UpdateUser(){
             </form>
         </div>
     )
-
 }
+
+export default UpdateUser;

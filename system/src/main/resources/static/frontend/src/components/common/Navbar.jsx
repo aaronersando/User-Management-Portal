@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import UserService from "../../services/UserService";
+import UserService from "../service/UserService";
 
 function Navbar() { 
     const isAuthenticated = UserService.isAuthenticated();

@@ -45,7 +45,7 @@ public class UserManagementController {
         return ResponseEntity.ok(usersManagementService.getAllUsers());
     }
     
-    @GetMapping("/admin/get-users/{userId}")
+    @GetMapping("/admin/get-user/{userId}")  // Changed from /admin/get-users/{userId}
     public ResponseEntity<RequestResponse> getUserById(@PathVariable Integer userId) {
         return ResponseEntity.ok(usersManagementService.getUserById(userId));
     }
@@ -61,6 +61,19 @@ public class UserManagementController {
         String email = authentication.getName(); // Get the email from the authentication object
         RequestResponse response = usersManagementService.getMyInfo(email);
         return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
+
+    @PutMapping("/adminuser/update-profile/{userId}")
+    public ResponseEntity<RequestResponse> updateOwnProfile(@PathVariable Integer userId, @RequestBody OurUsers reqres) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        RequestResponse response = usersManagementService.getMyInfo(email);
+        
+        // Only allow updating if it's the user's own profile
+        if (response.getOurUsers().getId() == userId) {
+            return ResponseEntity.ok(usersManagementService.updateUser(userId, reqres));
+        }
+        return ResponseEntity.status(403).build();
     }
 
     @DeleteMapping("/admin/delete/{userId}")
