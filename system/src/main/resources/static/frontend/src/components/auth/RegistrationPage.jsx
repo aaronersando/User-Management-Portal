@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import UserService from "../../services/UserService";
+import UserService from "../service/UserService";
 
 function RegistrationPage(){
     const navigate = useNavigate();
@@ -24,7 +24,7 @@ function RegistrationPage(){
 
             // Calls register method from userservice
             const token = localStorage.getItem('token');
-            await userService.register(formData, token);
+            await UserService.register(formData, token);
             
             setFormData({
                 name: "",
