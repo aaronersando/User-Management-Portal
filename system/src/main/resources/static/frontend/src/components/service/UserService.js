@@ -72,7 +72,7 @@ class UserService{
         }
     }
 
-    static async getUserByid(userId, token){
+    static async getUserById(userId, token){
         try{
             const response = await axios.post(`${UsersService.BASE_URL}/admin/delete/${userId}`, {
 
